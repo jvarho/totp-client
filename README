@@ -1,0 +1,18 @@
+TOTP Client
+---
+
+RFC 6238 -compatible Time-based One-Time Password client that stores secrets
+in the system keyring.
+
+Usage:
+---
+
+    totp-client.py [-h] [-n | -d | -l] USER
+
+
+    USER          username for storing and retrieving
+
+    -n, --new     encrypt and store new TOTP secret in keyring
+    -d, --delete  delete a TOTP secret from keyring
+    -l, --loop    loop producing new tokens every 30s until interrupted
+
