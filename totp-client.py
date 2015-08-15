@@ -14,7 +14,7 @@
 # ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 # OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-'''TOTP Client
+'''TOTP-Client
 
 Stores TOTP secrets in system keyring and generates tokens based on them.
 '''
@@ -33,6 +33,9 @@ import sys
 import getpass
 import keyring
 import pylibscrypt
+
+
+__version__ = '0.1.0'
 
 
 # defaults from the RFC and/or real world
@@ -96,14 +99,17 @@ def die(m):
 
 
 def parse_args():
-    parser = argparse.ArgumentParser(description=__doc__)
+    description = __doc__.split('\n')[2]
+    parser = argparse.ArgumentParser('TOTP-Client', description=description)
+    parser.add_argument('-v', '--version', action='version',
+                        version='%(prog)s ' + __version__)
     action = parser.add_mutually_exclusive_group()
     action.add_argument('-n', '--new', action='store_true',
                         help='encrypt and store new TOTP secret in keyring')
     action.add_argument('-d', '--delete', action='store_true',
                         help='delete a TOTP secret from keyring')
     action.add_argument('-l', '--loop', action='store_true',
-                        help=('loop producing new tokens every 30s until'
+                        help=('loop producing new tokens as they expire, until'
                               ' interrupted'))
     parser.add_argument('--hash',
                         help='the HOTP hash algorithm (default: sha1)')
