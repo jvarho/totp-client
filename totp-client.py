@@ -70,7 +70,13 @@ def get_totp(key, digits=6):
     d = struct.unpack('>I', h[o:o+4])[0] & 0x7fffffff
     return d % (10 ** digits)
 
-if __name__ == '__main__':
+
+def die(m):
+    sys.stderr.write(m + '\n')
+    sys.exit(1)
+
+
+def parse_args():
     parser = argparse.ArgumentParser(description=__doc__)
     action = parser.add_mutually_exclusive_group()
     action.add_argument('-n', '--new', action='store_true',
@@ -81,38 +87,49 @@ if __name__ == '__main__':
                         help=('loop producing new tokens every 30s until'
                                     ' interrupted'))
     parser.add_argument('USER', help='username for storing and retrieving')
-    args = parser.parse_args()
-    name = args.USER
+    return parser.parse_args()
 
-    def die(m):
-        sys.stderr.write(m + '\n')
-        sys.exit(1)
 
-    if args.new:
-        if retrieve_key(name):
-            die('A TOTP secret for "%s" already exists!' % name)
-        key = getpass.getpass('TOTP key:')
-        pwd = getpass.getpass('Encryption password:')
-        e = enc_key(key, pwd)
-        store_key(name, e)
-        sys.exit()
+def op_new(name):
+    if retrieve_key(name):
+        die('A TOTP secret for "%s" already exists!' % name)
+    key = getpass.getpass('TOTP key:')
+    pwd = getpass.getpass('Encryption password:')
+    e = enc_key(key, pwd)
+    store_key(name, e)
 
+
+def op_delete(name):
     e = retrieve_key(name)
     if not e:
         die('A TOTP secret for "%s" not found!' % name)
+    delete_key(name)
 
-    if args.delete:
-        delete_key(name)
-        sys.exit()
+
+def op_token(name, loop):
+    e = retrieve_key(name)
+    if not e:
+        die('A TOTP secret for "%s" not found!' % name)
 
     pwd = getpass.getpass('Encryption password:')
     key = dec_key(e, pwd)
     while True:
         print(get_totp(key))
-        if not args.loop:
+        if not loop:
             sys.exit()
 
         t = time.time()
         dt = int(t/30 + 1)*30 - t
         time.sleep(dt + 0.5)
+
+
+if __name__ == '__main__':
+    args = parse_args()
+
+    if args.new:
+        op_new(args.USER)
+    elif args.delete:
+        op_delete(args.USER)
+    else:
+        op_token(args.USER, args.loop)
 
