@@ -172,10 +172,10 @@ if __name__ == '__main__':
     if args.digits:
         try:
             hotp_length = int(args.digits)
-            if hotp_length < 6 or hotp_length > 10:
+            if hotp_length < 6 or hotp_length > 8:
                 raise
         except:
-            die('Digits must be between 6 and 10, not "%s"!' % args.digits)
+            die('Digits must be between 6 and 8, not "%s"!' % args.digits)
 
     if args.zero:
         try:
