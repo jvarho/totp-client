@@ -28,3 +28,19 @@ optional arguments:
   --digits DIGITS    token length in digits (default: 6)
   --zero ZERO        time to start counting from (default: 0)
 
+
+Example:
+---
+
+Store the secret for an email address:
+
+./totp-client.py -n user@example.com
+TOTP key:
+Encryption password:
+
+Generate a one-time password to log in:
+
+./totp-client.py user@example.com
+Encryption password:
+068800
+
