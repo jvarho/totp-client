@@ -35,6 +35,12 @@ import keyring
 import pylibscrypt
 
 
+# defaults from the RFC and/or real world
+hotp_hash = hashlib.sha1
+hotp_length = 6
+totp_timeout = 30
+
+
 def store_key(name, key):
     keyring.set_password('totp-client', name, key)
 
@@ -65,12 +71,12 @@ def dec_key(key, pwd):
     return key
 
 
-def get_totp(key, digits=6):
-    t = int(time.time() / 30)
-    h = bytearray(hmac.new(key, struct.pack('>Q', t), hashlib.sha1).digest())
+def get_totp(key):
+    t = int(time.time() / totp_timeout)
+    h = bytearray(hmac.new(key, struct.pack('>Q', t), hotp_hash).digest())
     o = h[19] & 0xf
     d = struct.unpack('>I', h[o:o+4])[0] & 0x7fffffff
-    return d % (10 ** digits)
+    return d % (10 ** hotp_length)
 
 
 def die(m):
@@ -122,12 +128,12 @@ def op_token(name, loop):
             break
 
         t = time.time()
-        t0 = int(t/30)*30
+        t0 = int(t / totp_timeout) * totp_timeout
         print('.'*(int(t-t0)//1), end='')
         sys.stdout.flush()
-        t1 = t0 + 30
+        t1 = t0 + totp_timeout
         while t < t1:
-            time.sleep(min(1, t1-t+0.5))
+            time.sleep(min(1, t1 - t + 0.5))
             print('.', end='')
             sys.stdout.flush()
             t = time.time()
