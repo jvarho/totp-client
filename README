@@ -7,26 +7,26 @@ in the system keyring.
 Usage:
 ---
 
-usage: TOTP-Client [-h] [-v] [-n | -d | -l] [--hash HASH] [--timeout TIMEOUT]
-                   [--digits DIGITS] [--zero ZERO]
-                   USER
+    usage: TOTP-Client [-h] [-v] [-n | -d | -l] [--hash HASH] [--timeout TIMEOUT]
+                       [--digits DIGITS] [--zero ZERO]
+                       USER
 
-Stores TOTP secrets in system keyring and generates tokens based on them.
+    Stores TOTP secrets in system keyring and generates tokens based on them.
 
-positional arguments:
-  USER               username for the secret (required)
+    positional arguments:
+      USER               username for the secret (required)
 
-optional arguments:
-  -h, --help         show this help message and exit
-  -v, --version      show program's version number and exit
-  -n, --new          encrypt and store new TOTP secret in keyring
-  -d, --delete       delete a TOTP secret from keyring
-  -l, --loop         loop producing new tokens as they expire, until
-                     interrupted
-  --hash HASH        the HOTP hash algorithm (default: sha1)
-  --timeout TIMEOUT  the TOTP timeout in seconds (default: 30)
-  --digits DIGITS    token length in digits (default: 6)
-  --zero ZERO        time to start counting from (default: 0)
+    optional arguments:
+      -h, --help         show this help message and exit
+      -v, --version      show program's version number and exit
+      -n, --new          encrypt and store new TOTP secret in keyring
+      -d, --delete       delete a TOTP secret from keyring
+      -l, --loop         loop producing new tokens as they expire, until
+                         interrupted
+      --hash HASH        the HOTP hash algorithm (default: sha1)
+      --timeout TIMEOUT  the TOTP timeout in seconds (default: 30)
+      --digits DIGITS    token length in digits (default: 6)
+      --zero ZERO        time to start counting from (default: 0)
 
 
 Example:
@@ -34,13 +34,13 @@ Example:
 
 Store the secret for an email address:
 
-./totp-client.py -n user@example.com
-TOTP key:
-Encryption password:
+    ./totp-client.py -n user@example.com
+    TOTP key:
+    Encryption password:
 
 Generate a one-time password to log in:
 
-./totp-client.py user@example.com
-Encryption password:
-068800
+    ./totp-client.py user@example.com
+    Encryption password:
+    068800
 
