@@ -94,8 +94,12 @@ def parse_args():
     action.add_argument('-l', '--loop', action='store_true',
                         help=('loop producing new tokens every 30s until'
                               ' interrupted'))
-    action.add_argument('-a', '--hash',
-                        help=('choose the HOTP hash algorithm (default: sha1)'))
+    parser.add_argument('--hash',
+                        help=('the HOTP hash algorithm (default: sha1)'))
+    parser.add_argument('--timeout',
+                        help=('the TOTP timeout in seconds (default: 30)'))
+    parser.add_argument('--digits',
+                        help=('output length in digits (default: 6)'))
     parser.add_argument('USER', help='username for storing and retrieving')
     return parser.parse_args()
 
@@ -153,6 +157,22 @@ if __name__ == '__main__':
                  'Supported algorithms include: %s.')
                 % (args.hash, ', '.join(hashlib.algorithms)))
         hotp_hash = lambda:hashlib.new(args.hash)
+
+    if args.timeout:
+        try:
+            totp_timeout = float(args.timeout)
+            if totp_timeout <= 0:
+                raise
+        except:
+            die('Timeout must be a positive number, not "%s"!' % args.timeout)
+
+    if args.digits:
+        try:
+            hotp_length = int(args.digits)
+            if hotp_length < 6 or hotp_length > 10:
+                raise
+        except:
+            die('Digits must be between 6 and 10, not "%s"!' % args.digits)
 
     if args.new:
         op_new(args.USER)
