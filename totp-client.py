@@ -75,7 +75,7 @@ def dec_key(key, pwd):
 def get_totp(key):
     t = int((time.time() - totp_zero) / totp_timeout)
     h = bytearray(hmac.new(key, struct.pack('>Q', t), hotp_hash).digest())
-    o = h[19] & 0xf
+    o = h[-1] & 0xf
     d = struct.unpack('>I', h[o:o+4])[0] & 0x7fffffff
     d = d % (10 ** hotp_length)
     fmt = '%0' + ('%d' % hotp_length) + 'd'
