@@ -39,6 +39,7 @@ import pylibscrypt
 hotp_hash = hashlib.sha1
 hotp_length = 6
 totp_timeout = 30
+totp_zero = 0
 
 
 def store_key(name, key):
@@ -72,7 +73,7 @@ def dec_key(key, pwd):
 
 
 def get_totp(key):
-    t = int(time.time() / totp_timeout)
+    t = int((time.time() - totp_zero) / totp_timeout)
     h = bytearray(hmac.new(key, struct.pack('>Q', t), hotp_hash).digest())
     o = h[19] & 0xf
     d = struct.unpack('>I', h[o:o+4])[0] & 0x7fffffff
@@ -95,12 +96,14 @@ def parse_args():
                         help=('loop producing new tokens every 30s until'
                               ' interrupted'))
     parser.add_argument('--hash',
-                        help=('the HOTP hash algorithm (default: sha1)'))
+                        help='the HOTP hash algorithm (default: sha1)')
     parser.add_argument('--timeout',
-                        help=('the TOTP timeout in seconds (default: 30)'))
+                        help='the TOTP timeout in seconds (default: 30)')
     parser.add_argument('--digits',
-                        help=('output length in digits (default: 6)'))
-    parser.add_argument('USER', help='username for storing and retrieving')
+                        help='token length in digits (default: 6)')
+    parser.add_argument('--zero',
+                        help='time to start counting from (default: 0)')
+    parser.add_argument('USER', help='username for the secret (required)')
     return parser.parse_args()
 
 
@@ -133,7 +136,7 @@ def op_token(name, loop):
             print()
             break
 
-        t = time.time()
+        t = time.time() - totp_zero
         t0 = int(t / totp_timeout) * totp_timeout
         print('.'*(int(t-t0)//1), end='')
         sys.stdout.flush()
@@ -142,7 +145,7 @@ def op_token(name, loop):
             time.sleep(min(1, t1 - t + 0.5))
             print('.', end='')
             sys.stdout.flush()
-            t = time.time()
+            t = time.time() - totp_zero
         print()
 
 
@@ -173,6 +176,15 @@ if __name__ == '__main__':
                 raise
         except:
             die('Digits must be between 6 and 10, not "%s"!' % args.digits)
+
+    if args.zero:
+        try:
+            totp_zero = float(args.zero)
+            if totp_zero < 0 or totp_zero > time.time():
+                raise
+        except:
+            die('Zero must be seconds of UNIX time from the epoch, not "%s"!'
+                % args.zero)
 
     if args.new:
         op_new(args.USER)
