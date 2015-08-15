@@ -82,6 +82,14 @@ def get_totp(key):
     return fmt % d
 
 
+def get_pass(msg):
+    pwd = getpass.getpass(msg)
+    try:
+        return pwd.decode(sys.stdin.encoding).encode('utf8')
+    except AttributeError:
+        return bytes(pwd, 'utf8')
+
+
 def die(m):
     sys.stderr.write(m + '\n')
     sys.exit(1)
@@ -112,8 +120,8 @@ def parse_args():
 def op_new(name):
     if retrieve_key(name):
         die('A TOTP secret for "%s" already exists!' % name)
-    key = getpass.getpass('TOTP key:')
-    pwd = getpass.getpass('Encryption password:')
+    key = get_pass('TOTP key:')
+    pwd = get_pass('Encryption password:')
     e = enc_key(key, pwd)
     store_key(name, e)
 
@@ -130,7 +138,7 @@ def op_token(name, loop):
     if not e:
         die('A TOTP secret for "%s" not found!' % name)
 
-    pwd = getpass.getpass('Encryption password:')
+    pwd = get_pass('Encryption password:')
     key = dec_key(e, pwd)
     while True:
         print(get_totp(key), end='')
