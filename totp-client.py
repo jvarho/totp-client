@@ -19,6 +19,8 @@
 Stores TOTP secrets in system keyring and generates tokens based on them.
 '''
 
+from __future__ import print_function
+
 import argparse
 import base64
 import hashlib
@@ -114,13 +116,22 @@ def op_token(name, loop):
     pwd = getpass.getpass('Encryption password:')
     key = dec_key(e, pwd)
     while True:
-        print(get_totp(key))
+        print(get_totp(key), end='')
         if not loop:
-            sys.exit()
+            print()
+            break
 
         t = time.time()
-        dt = int(t/30 + 1)*30 - t
-        time.sleep(dt + 0.5)
+        t0 = int(t/30)*30
+        print('.'*(int(t-t0)//1), end='')
+        sys.stdout.flush()
+        t1 = t0 + 30
+        while t < t1:
+            time.sleep(min(1, t1-t+0.5))
+            print('.', end='')
+            sys.stdout.flush()
+            t = time.time()
+        print()
 
 
 if __name__ == '__main__':
