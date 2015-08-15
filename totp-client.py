@@ -93,7 +93,9 @@ def parse_args():
                         help='delete a TOTP secret from keyring')
     action.add_argument('-l', '--loop', action='store_true',
                         help=('loop producing new tokens every 30s until'
-                                    ' interrupted'))
+                              ' interrupted'))
+    action.add_argument('-a', '--hash',
+                        help=('choose the HOTP hash algorithm (default: sha1)'))
     parser.add_argument('USER', help='username for storing and retrieving')
     return parser.parse_args()
 
@@ -142,6 +144,15 @@ def op_token(name, loop):
 
 if __name__ == '__main__':
     args = parse_args()
+
+    if args.hash:
+        try:
+            hashlib.new(args.hash)
+        except ValueError:
+            die(('Unsupported hash algorithm "%s"!\n'
+                 'Supported algorithms include: %s.')
+                % (args.hash, ', '.join(hashlib.algorithms)))
+        hotp_hash = lambda:hashlib.new(args.hash)
 
     if args.new:
         op_new(args.USER)
