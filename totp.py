@@ -49,6 +49,7 @@ class TOTP(object):
         self.t_zero = t_zero
 
     def dec_key(self, pwd):
+        self.key = bytearray(self.key)
         pad = bytearray(pylibscrypt.scrypt(pwd, self.salt, olen=len(self.key)))
         for i, p in enumerate(pad):
             self.key[i] = self.key[i] ^ p
@@ -95,7 +96,7 @@ class TOTP(object):
     @staticmethod
     def from_json(j, pwd=None, **kwargs):
         d = json.loads(j)
-        d['key'] = bytearray(base64.b16decode(d['key']))
+        d['key'] = base64.b16decode(d['key'])
         d['salt'] = d['salt'].encode('ascii')
         d.update(kwargs)
         t = TOTP(**d)
