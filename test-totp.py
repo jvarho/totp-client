@@ -75,6 +75,15 @@ class TOTPTests(unittest.TestCase):
     def test_vector_p3(self):
         self._test_vector('asdf', 40, '865509', pwd='qwerty', salt='1234')
 
+    def test_vector_p4(self):
+        self._test_vector('asdfg', 10, '015311', pwd='qwerty', salt='1234')
+
+    def test_vector_p5(self):
+        self._test_vector('asdf', 10, '986141', pwd='qwertyu', salt='1234')
+
+    def test_vector_p6(self):
+        self._test_vector('asdf', 10, '490784', pwd='qwerty', salt='12345')
+
 
 if __name__ == '__main__':
     suite = unittest.TestSuite()
