@@ -111,13 +111,17 @@ def parse_args():
     action.add_argument('-l', '--loop', action='store_true',
                         help=('loop producing new tokens as they expire, until'
                               ' interrupted'))
-    parser.add_argument('--hash',
+    modifiers = parser.add_argument_group(
+        description='The following arguments modify the TOTP/HOTP parameters.'
+        ' The defaults work for gauth compatible use.'
+    )
+    modifiers.add_argument('--hash',
                         help='the HOTP hash algorithm (default: sha1)')
-    parser.add_argument('--timeout',
+    modifiers.add_argument('--timeout',
                         help='the TOTP timeout in seconds (default: 30)')
-    parser.add_argument('--digits',
+    modifiers.add_argument('--digits',
                         help='token length in digits (default: 6)')
-    parser.add_argument('--zero',
+    modifiers.add_argument('--zero',
                         help='time to start counting from (default: 0)')
     parser.add_argument('USER', help='username for the secret (required)')
     return parser.parse_args()
