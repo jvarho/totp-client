@@ -66,18 +66,21 @@ def parse_args():
     description = __doc__.split('\n')[2]
     parser = argparse.ArgumentParser('TOTP-Client', description=description)
     parser.add_argument('-v', '--version', action='version',
-                        version='%(prog)s ' + __version__)
+                        version='%(prog)s ' + __version__,
+                        help=argparse.SUPPRESS)
     action = parser.add_mutually_exclusive_group()
     action.add_argument('-n', '--new', action='store_true',
                         help='encrypt and store new TOTP secret in keyring')
     action.add_argument('-d', '--delete', action='store_true',
                         help='delete a TOTP secret from keyring')
     action.add_argument('-l', '--loop', action='store_true',
-                        help=('loop producing new tokens as they expire, until'
+                        help=('produce new tokens as they expire, until'
                               ' interrupted'))
     modifiers = parser.add_argument_group(
         description='The following arguments modify the TOTP/HOTP parameters.'
         ' The defaults work for gauth compatible use.'
+        ' Parameter options used with --new are stored.'
+        ' Parameter options used when generating tokens override them.'
     )
     modifiers.add_argument('--hash',
                         help='the HOTP hash algorithm (default: sha1)')
