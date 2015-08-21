@@ -30,9 +30,17 @@ import time
 import pylibscrypt
 
 
+# defaults from the RFC and/or real world
+H_HASH = 'sha1'
+H_LENGTH = 6
+T_TIMEOUT = 30
+T_ZERO = 0
+
+
 class TOTP(object):
 
-    def __init__(self, key, salt, h_length, h_hash, t_timeout, t_zero):
+    def __init__(self, key, salt=None, h_length=H_LENGTH, h_hash=H_HASH,
+                 t_timeout=T_TIMEOUT, t_zero=T_ZERO):
         self.key = key
         self.salt = salt
         self.h_length = h_length
@@ -85,10 +93,11 @@ class TOTP(object):
         })
 
     @staticmethod
-    def from_json(j, pwd=None):
+    def from_json(j, pwd=None, **kwargs):
         d = json.loads(j)
         d['key'] = bytearray(base64.b16decode(d['key']))
         d['salt'] = d['salt'].encode('ascii')
+        d.update(kwargs)
         t = TOTP(**d)
         if pwd is not None:
             t.dec_key(pwd)

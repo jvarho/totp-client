@@ -37,13 +37,6 @@ from totp import TOTP
 __version__ = '0.1.0'
 
 
-# defaults from the RFC and/or real world
-hotp_hash = 'sha1'
-hotp_length = 6
-totp_timeout = 30
-totp_zero = 0
-
-
 def store_key(name, key):
     keyring.set_password('totp-client', name, key)
 
@@ -94,13 +87,12 @@ def parse_args():
     return parser.parse_args()
 
 
-def op_new(name):
+def op_new(name, modifiers):
     if retrieve_key(name):
         die('A TOTP secret for "%s" already exists!' % name)
     key = get_pass('TOTP key:')
     pwd = get_pass('Encryption password:')
-    t = TOTP(key, salt=None, h_length=hotp_length, h_hash=hotp_hash,
-             t_timeout=totp_timeout, t_zero=totp_zero)
+    t = TOTP(key, salt=None, **modififers)
     e = t.to_json(pwd)
     store_key(name, e)
 
@@ -112,13 +104,13 @@ def op_delete(name):
     delete_key(name)
 
 
-def op_token(name, loop):
+def op_token(name, loop, modifiers):
     e = retrieve_key(name)
     if not e:
         die('A TOTP secret for "%s" not found!' % name)
 
     pwd = get_pass('Encryption password:')
-    t = TOTP.from_json(e, pwd)
+    t = TOTP.from_json(e, pwd, **modifiers)
     while True:
         print(t.token(), end='')
         if not loop:
@@ -132,6 +124,8 @@ def op_token(name, loop):
 if __name__ == '__main__':
     args = parse_args()
 
+    modifiers = {}
+
     if args.hash:
         try:
             hashlib.new(args.hash)
@@ -139,13 +133,14 @@ if __name__ == '__main__':
             die(('Unsupported hash algorithm "%s"!\n'
                  'Supported algorithms include: %s.')
                 % (args.hash, ', '.join(hashlib.algorithms)))
-        hotp_hash = args.hash
+        modifiers['h_hash'] = args.hash
 
     if args.timeout:
         try:
             totp_timeout = float(args.timeout)
             if totp_timeout <= 0:
                 raise
+            modifiers['t_timeout'] = totp_timeout
         except:
             die('Timeout must be a positive number, not "%s"!' % args.timeout)
 
@@ -154,6 +149,7 @@ if __name__ == '__main__':
             hotp_length = int(args.digits)
             if hotp_length < 6 or hotp_length > 8:
                 raise
+            modifiers['h_length'] = hotp_length
         except:
             die('Digits must be between 6 and 8, not "%s"!' % args.digits)
 
@@ -162,14 +158,15 @@ if __name__ == '__main__':
             totp_zero = float(args.zero)
             if totp_zero < 0 or totp_zero > time.time():
                 raise
+            modifiers['t_zero'] = totp_zero
         except:
             die('Zero must be seconds of UNIX time from the epoch, not "%s"!'
                 % args.zero)
 
     if args.new:
-        op_new(args.USER)
+        op_new(args.USER, modifiers)
     elif args.delete:
         op_delete(args.USER)
     else:
-        op_token(args.USER, args.loop)
+        op_token(args.USER, args.loop, modifiers)
 
