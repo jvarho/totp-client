@@ -24,8 +24,10 @@ import time
 
 class TOTPTests(unittest.TestCase):
     """Tests TOTP"""
-    def _test_vector(self, secret, at, token, **kwargs):
+    def _test_vector(self, secret, at, token, pwd=None, **kwargs):
         t = totp.TOTP(secret, **kwargs)
+        if pwd is not None:
+            t.dec_key(pwd)
         tmp = time.time
         try:
             time.time = lambda:at
@@ -63,6 +65,15 @@ class TOTPTests(unittest.TestCase):
 
     def test_vector_n10(self):
         self._test_vector('1234', 100, '336582', t_timeout=60)
+
+    def test_vector_p1(self):
+        self._test_vector('asdf', 10, '036575', pwd='qwerty', salt='1234')
+
+    def test_vector_p2(self):
+        self._test_vector('asdf', 20, '036575', pwd='qwerty', salt='1234')
+
+    def test_vector_p3(self):
+        self._test_vector('asdf', 40, '865509', pwd='qwerty', salt='1234')
 
 
 if __name__ == '__main__':
