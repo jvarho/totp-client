@@ -29,10 +29,7 @@ import sys
 import getpass
 import keyring
 
-from totp import TOTP
-
-
-__version__ = '0.2.0'
+from totp import TOTP, __version__
 
 
 def store_key(name, key):

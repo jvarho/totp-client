@@ -30,6 +30,9 @@ import time
 import pylibscrypt
 
 
+__version__ = '0.3.0'
+
+
 # defaults from the RFC and/or real world
 H_HASH = 'sha1'
 H_LENGTH = 6
