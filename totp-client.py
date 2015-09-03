@@ -23,9 +23,7 @@ from __future__ import print_function
 
 import argparse
 import hashlib
-import hmac
 import time
-import struct
 import sys
 
 import getpass
