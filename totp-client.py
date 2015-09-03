@@ -119,7 +119,7 @@ def op_token(name, loop, modifiers):
     pwd = get_pass('Encryption password:')
     t = TOTP.from_json(e, pwd, **modifiers)
     while True:
-        print(t.token(), end='')
+        print(t.token().decode(), end='')
         if not loop:
             print()
             break

@@ -64,7 +64,11 @@ class TOTP(object):
         d = struct.unpack('>I', h[o:o+4])[0] & 0x7fffffff
         d = d % (10 ** self.h_length)
         fmt = '%0' + ('%d' % self.h_length) + 'd'
-        return fmt % d
+        fmt = fmt % d
+        try:
+            return bytes(fmt)
+        except TypeError:
+            return bytes(fmt, 'utf8')
 
     def wait(self):
         t = time.time() - self.t_zero
