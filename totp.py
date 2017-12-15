@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-# Copyright (c) 2015, Jan Varho
+# Copyright (c) 2015-2017, Jan Varho
 #
 # Permission to use, copy, modify, and/or distribute this software for any
 # purpose with or without fee is hereby granted, provided that the above
@@ -30,7 +30,7 @@ import time
 import pylibscrypt
 
 
-__version__ = '0.3.0'
+__version__ = '1.0.0'
 
 
 # defaults from the RFC and/or real world
@@ -92,8 +92,8 @@ class TOTP(object):
         for i, p in enumerate(pad):
             key[i] = key[i] ^ p
         return json.dumps({
-            'key': base64.b16encode(key),
-            'salt': salt,
+            'key': base64.b16encode(key).decode('ascii'),
+            'salt': salt.decode('ascii'),
             'h_length': self.h_length,
             'h_hash': self.h_hash,
             't_timeout': self.t_timeout,

@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-# Copyright (c) 2015, Jan Varho
+# Copyright (c) 2015-2017, Jan Varho
 #
 # Permission to use, copy, modify, and/or distribute this software for any
 # purpose with or without fee is hereby granted, provided that the above
@@ -31,6 +31,9 @@ class TOTPTest(unittest.TestCase):
         try:
             time.time = lambda:at
             o = t.token()
+            if pwd is not None:
+                t2 = totp.TOTP.from_json(t.to_json(pwd), pwd)
+                self.assertEqual(t.token(), t2.token())
         finally:
             time.time = tmp
         self.assertEqual(token, o)
